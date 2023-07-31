@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:16beta1-alpine3.18
+    restart: always
+    volumes:
+      - ./postgresql:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_USER: odoo
+      POSTGRES_DB: postgres
+  odoo:
+    platform: linux/x86_64
+    image: odoo:16
+    restart: always
+    volumes:
+      - ./addons:/mnt/extra-addons
+      - ./etc:/etc/odoo
+      - ./backups:/mnt/backups
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      - PGHOST=db
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+    links:
+      - db:db
